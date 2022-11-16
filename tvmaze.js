@@ -2,6 +2,7 @@
 
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
+const $episodesList = $("#episodesList");
 const $searchForm = $("#searchForm");
 
 const SHOWS_BASE_URL = "http://api.tvmaze.com/search/shows";
@@ -84,8 +85,33 @@ $searchForm.on("submit", async function (evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+async function getEpisodesOfShow(id) {
+  let episodesUrl = `${EPISODES_BASE_URL}${id}/episodes`
+  let episodes = await axios.get(episodesUrl);
+
+  let episodesInfo = episodes.data.map(episode => {
+    return {
+      id: episode.id,
+      name: episode.name,
+      season: episode.season,
+      number: episode.number
+    }
+  })
+
+  return episodesInfo;
+}
 
 /** Write a clear docstring for this function... */
 
-// function populateEpisodes(episodes)
+function populateEpisodes(episodes) {
+  $episodesList.empty();
+
+  for (let episode of episodes) {
+    let $episode = $(
+      `<li>${episode.name} (season ${episode.season}, 
+          number ${episode.number})</li>`
+    )
+
+    $episodesList.append($episode);
+  }
+}
