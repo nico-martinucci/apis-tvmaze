@@ -3,10 +3,10 @@
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
-const $searchFormTerm = $("#searchForm-term");
 
 const SHOWS_BASE_URL = "http://api.tvmaze.com/search/shows";
-const EPISODES_BASE_URL = "http://api.tvmaze.com/shows/"
+const EPISODES_BASE_URL = "http://api.tvmaze.com/shows/";
+const MISSING_IMG_URL = "https://tinyurl.com/tv-missing";
 
 
 /** Given a search term, search for tv shows that match that query.
@@ -20,11 +20,20 @@ async function getShowsByTerm(term) {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
 
   let shows = await axios.get(SHOWS_BASE_URL, { params: { q: term } });
-  console.log(shows);
+
+  let showsCollection = shows.data.map(show => {
+    return {id: show.show.id,
+    name: show.show.name,
+    summ: show.show.summary,
+    img: show.show.image.original || MISSING_IMG_URL,
+    }
+  })
+
+  return showsCollection;
 }
 
 
-/** Given list of shows, create markup for each and to DOM */
+/** Given list of shows, create markup for each and add to DOM */
 
 function populateShows(shows) {
   $showsList.empty();
@@ -33,22 +42,23 @@ function populateShows(shows) {
     const $show = $(
         `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
-           <img 
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg" 
-              alt="Bletchly Circle San Francisco" 
+           <img
+              src=${show.img}
+              alt="image for ${show.name}"
               class="w-25 me-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
-             <div><small>${show.summary}</small></div>
+             <div><small>${show.summ}</small></div>
              <button class="btn btn-outline-light btn-sm Show-getEpisodes">
                Episodes
              </button>
            </div>
-         </div>  
+         </div>
        </div>
       `);
 
-    $showsList.append($show);  }
+    $showsList.append($show);
+  }
 }
 
 
@@ -78,4 +88,4 @@ $searchForm.on("submit", async function (evt) {
 
 /** Write a clear docstring for this function... */
 
-// function populateEpisodes(episodes) { }
+// function populateEpisodes(episodes)
