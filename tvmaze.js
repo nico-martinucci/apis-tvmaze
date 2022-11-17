@@ -20,9 +20,9 @@ const MISSING_IMG_URL = "https://tinyurl.com/tv-missing";
 async function getShowsByTerm(term) {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
 
-  let shows = await axios.get(SHOWS_BASE_URL, { params: { q: term } });
+  const shows = await axios.get(SHOWS_BASE_URL, { params: { q: term } });
 
-  let showsCollection = shows.data.map(show => {
+  const showsCollection = shows.data.map(show => {
     return {id: show.show.id,
     name: show.show.name,
     summ: show.show.summary,
@@ -41,7 +41,7 @@ function populateShows(shows) {
 
   for (let show of shows) {
     const $show = $(
-        `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
+      `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
               src=${show.img}
@@ -86,10 +86,10 @@ $searchForm.on("submit", async function (evt) {
  */
 
 async function getEpisodesOfShow(id) {
-  let episodesUrl = `${EPISODES_BASE_URL}${id}/episodes`
-  let episodes = await axios.get(episodesUrl);
+  const episodesUrl = `${EPISODES_BASE_URL}${id}/episodes`
+  const episodes = await axios.get(episodesUrl);
 
-  let episodesInfo = episodes.data.map(episode => {
+  const episodesInfo = episodes.data.map(episode => {
     return {
       id: episode.id,
       name: episode.name,
@@ -101,17 +101,32 @@ async function getEpisodesOfShow(id) {
   return episodesInfo;
 }
 
-/** Write a clear docstring for this function... */
+/** Append all episodes to episode area as a list
+ * with info on name, season, and ep number
+ */
 
 function populateEpisodes(episodes) {
   $episodesList.empty();
 
   for (let episode of episodes) {
     let $episode = $(
-      `<li>${episode.name} (season ${episode.season}, 
+      `<li>${episode.name} (season ${episode.season},
           number ${episode.number})</li>`
     )
 
     $episodesList.append($episode);
   }
 }
+
+/** on click of the episode button, get show ID
+ * and add episodes to the DOM */
+
+async function getEpisodesAndDisplay(evt) {
+  $episodesArea.show();
+  const id = $(evt.target).parent().parent().parent().data("show-id");
+
+  const episodesInfo = await getEpisodesOfShow(id);
+  populateEpisodes(episodesInfo);
+}
+
+$showsList.on("click", "button", getEpisodesAndDisplay)
