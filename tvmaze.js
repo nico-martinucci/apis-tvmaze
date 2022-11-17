@@ -112,7 +112,7 @@ function populateEpisodes(episodes) {
     let $episode = $(
       `<li>${episode.name} (season ${episode.season},
           number ${episode.number})</li>`
-    )
+    );
 
     $episodesList.append($episode);
   }
@@ -129,4 +129,4 @@ async function getEpisodesAndDisplay(evt) {
   populateEpisodes(episodesInfo);
 }
 
-$showsList.on("click", "button", getEpisodesAndDisplay)
+$showsList.on("click", "button", getEpisodesAndDisplay);
